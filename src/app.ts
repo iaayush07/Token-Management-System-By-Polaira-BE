@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api/v1', router);
+app.use('/api', router);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -14,7 +14,7 @@ export const swaggerOptions: Options = {
     },
     servers: [
       {
-        url: '/api/v1',
+        url: '/api',
         description: 'Current version',
       },
     ],
@@ -75,6 +75,14 @@ export const swaggerOptions: Options = {
         },
       },
       responses: {
+        BadRequest: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ApiError' },
+            },
+          },
+        },
         NotFound: {
           description: 'Resource not found',
           content: {
@@ -92,11 +100,22 @@ export const swaggerOptions: Options = {
           },
         },
       },
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
     },
     tags: [
       {
         name: 'Health',
         description: 'Service liveness and readiness',
+      },
+      {
+        name: 'Auth',
+        description: 'User registration and authentication',
       },
     ],
   },
