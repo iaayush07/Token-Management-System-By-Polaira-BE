@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { signup, login } from '../controllers/authController.js';
+import { signup, login, me } from '../controllers/authController.js';
 import { signupValidator, loginValidator } from '../validators/auth.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
 
@@ -138,5 +139,58 @@ router.post('/signup', signupValidator, signup);
  *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/login', loginValidator, login);
+
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     summary: Get current user profile and permissions
+ *     description: Returns the authenticated user's profile and their assigned permissions.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile and permissions returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Profile retrieved successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     fullName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [EMPLOYEE, ADMIN]
+ *                     permissions:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: [dashboard, monthly_subscription, todays_token]
+ *       401:
+ *         description: Missing, invalid, or expired JWT token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+router.get('/me', authenticate, me);
 
 export default router;

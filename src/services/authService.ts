@@ -78,3 +78,34 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
 
   return { token };
 }
+
+const ROLE_PERMISSIONS: Record<string, string[]> = {
+  EMPLOYEE: ['dashboard', 'monthly_subscription', 'todays_token'],
+  ADMIN: ['dashboard', 'month_configuration', 'scan_token', 'reports'],
+};
+
+export interface MeResult {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  permissions: string[];
+}
+
+export async function getMeUser(userId: string): Promise<MeResult> {
+  const user = await User.findOne({ where: { id: userId } });
+
+  if (user === null) {
+    const err = new Error('User not found') as AppError;
+    err.statusCode = 401;
+    throw err;
+  }
+
+  return {
+    id: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role,
+    permissions: ROLE_PERMISSIONS[user.role] ?? [],
+  };
+}

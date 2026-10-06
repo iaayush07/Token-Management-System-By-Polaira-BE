@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { JwtPayload } from '../middleware/authenticate.js';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -12,3 +13,11 @@ export type AsyncRequestHandler = (
   res: Response,
   next: NextFunction,
 ) => Promise<void>;
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}

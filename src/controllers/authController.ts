@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { signupUser, loginUser } from '../services/authService.js';
+import { signupUser, loginUser, getMeUser } from '../services/authService.js';
 import { UserRole } from '../models/User.js';
 import { ApiResponse } from '../types/index.js';
 
@@ -40,6 +40,22 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
       message: 'Account created successfully',
     };
     res.status(201).json(body);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function me(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const userId = req.user!.sub;
+    const user = await getMeUser(userId);
+
+    const body: ApiResponse = {
+      success: true,
+      data: user,
+      message: 'Profile retrieved successfully',
+    };
+    res.status(200).json(body);
   } catch (err) {
     next(err);
   }
