@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { User, UserRole } from '../models/User.js';
 import { AppError } from '../middleware/error.js';
+import { config } from '../config/index.js';
 
 export interface SignupInput {
   fullName: string;
@@ -39,4 +41,40 @@ export async function signupUser(input: SignupInput): Promise<SignupResult> {
     email: user.email,
     role: user.role,
   };
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface LoginResult {
+  token: string;
+}
+
+export async function loginUser(input: LoginInput): Promise<LoginResult> {
+  const user = await User.findOne({ where: { email: input.email } });
+
+  const invalidCredentialsError = (): AppError => {
+    const err = new Error('Invalid credentials') as AppError;
+    err.statusCode = 401;
+    return err;
+  };
+
+  if (user === null) {
+    throw invalidCredentialsError();
+  }
+
+  const passwordMatch = await bcrypt.compare(input.password, user.passwordHash);
+  if (!passwordMatch) {
+    throw invalidCredentialsError();
+  }
+
+  const token = jwt.sign(
+    { sub: user.id, email: user.email, role: user.role },
+    config.jwtSecret,
+    { expiresIn: '8h' },
+  );
+
+  return { token };
 }

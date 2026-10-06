@@ -5,4 +5,5 @@ export const config = {
   port: parseInt(process.env['PORT'] ?? '3000', 10),
   logLevel: process.env['LOG_LEVEL'] ?? 'info',
   databaseUrl: process.env['DATABASE_URL'] ?? '',
+  jwtSecret: process.env['JWT_SECRET'] ?? 'change-me',
 } as const;

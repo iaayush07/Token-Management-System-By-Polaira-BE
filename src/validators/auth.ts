@@ -14,3 +14,10 @@ export const signupValidator = [
     .isIn(['EMPLOYEE', 'ADMIN'])
     .withMessage('Role must be EMPLOYEE or ADMIN'),
 ];
+
+export const loginValidator = [
+  body('email').trim().isEmail().withMessage('A valid email address is required'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters'),
+];

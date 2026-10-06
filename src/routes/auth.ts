@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { signup } from '../controllers/authController.js';
-import { signupValidator } from '../validators/auth.js';
+import { signup, login } from '../controllers/authController.js';
+import { signupValidator, loginValidator } from '../validators/auth.js';
 
 const router = Router();
 
@@ -79,5 +79,64 @@ const router = Router();
  *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/signup', signupValidator, signup);
+
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     summary: Log in with email and password
+ *     description: Authenticates a registered user and returns a signed JWT that expires in 8 hours.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: jane@example.com
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 example: securePass1
+ *     responses:
+ *       200:
+ *         description: Login successful — JWT token returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: Signed JWT valid for 8 hours
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+router.post('/login', loginValidator, login);
 
 export default router;
